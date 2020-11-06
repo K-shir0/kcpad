@@ -16,6 +16,7 @@
 import {remote} from "electron";
 
 /**
+ * ## 分割代入
  * 分割代入と呼ばれるjavascript構文です。
  *
  * const dialog = remote.dialog
@@ -34,15 +35,29 @@ export default {
 
     /**
      *
-     * @returns {Promise<void>}
+     * ファイルを開くための一連の処理をまとめたもの
      *
+     * */
+    async openFile() {
+      // ファイル選択ダイアログを開き選択したファイルのパスを取得する処理。
+      const path = await this.fileSelect();
+
+    },
+
+    /**
+     *
+     * @returns {Promise<*>}
+     *
+     * ## async awaitとは
      * 非同期のものはfunction名の前にasyncを修飾し、
      * さらに、非同期となる処理の所の前にはawaitを修飾します。
      *
      * 今回の場合ですと、ダイアログを開く処理が非同期なのでdialogの前にawaitを修飾しています。
      *
+     * ## 機能
+     * ファイルを選択するダイアログを開き、選択されたファイルのパスを取得する処理
      */
-    async openFile() {
+    async fileSelect() {
       // 現在フォーカスされているウィンドウを取得する。
       // https://www.electronjs.org/docs/api/browser-window
       const win = BrowserWindow.getFocusedWindow();
@@ -62,7 +77,10 @@ export default {
       console.log(fileNames);
       // Pathを取り出す
       console.log(fileNames.filePaths[0]);
-    },
+
+
+      return fileNames.filePaths[0]
+    }
   }
 }
 </script>
