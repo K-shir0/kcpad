@@ -14,6 +14,7 @@
 
 <script>
 import {remote} from "electron";
+import {readFile} from "fs";
 
 /**
  * ## 分割代入
@@ -40,13 +41,27 @@ export default {
      * */
     async openFile() {
       // ファイル選択ダイアログを開き選択したファイルのパスを取得する処理。
-      const path = await this.fileSelect();
+      const path = await this.selectFile();
+
+      readFile(path, (error, data) => {
+        // もし読み取れなければエラー
+        if (error != null) {
+          alert("file open error.");
+          return;
+        }
+
+        // 取得できてるかのテスト
+        console.log(data.toString());
+
+        // codeに内容を代入
+        this.code = data.toString();
+      });
 
     },
 
     /**
-     *
-     * @returns {Promise<*>}
+     * ファイルを選択するダイアログを開き、選択されたファイルのパスを取得する処理
+     * @returns {Promise<string>} 選択されたファイルのパスです。
      *
      * ## async awaitとは
      * 非同期のものはfunction名の前にasyncを修飾し、
@@ -54,10 +69,8 @@ export default {
      *
      * 今回の場合ですと、ダイアログを開く処理が非同期なのでdialogの前にawaitを修飾しています。
      *
-     * ## 機能
-     * ファイルを選択するダイアログを開き、選択されたファイルのパスを取得する処理
      */
-    async fileSelect() {
+    async selectFile() {
       // 現在フォーカスされているウィンドウを取得する。
       // https://www.electronjs.org/docs/api/browser-window
       const win = BrowserWindow.getFocusedWindow();
@@ -79,8 +92,9 @@ export default {
       console.log(fileNames.filePaths[0]);
 
 
-      return fileNames.filePaths[0]
-    }
+      return fileNames.filePaths[0];
+    },
+
   }
 }
 </script>
