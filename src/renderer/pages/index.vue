@@ -1,91 +1,68 @@
 <template>
   <div class="e-nuxt-container">
     <div class="e-nuxt-content">
-      <div class="e-nuxt-logo">
-        <img style="max-width: 100%;" src="~assets/electron-nuxt.png">
-      </div>
-      <div class="e-nuxt-system-info">
-        <system-information />
-      </div>
-    </div>
-    <div class="e-nuxt-links">
-      <div class="e-nuxt-button" @click="openURL('https://github.com/michalzaq12/electron-nuxt')">
-        Github
-      </div>
-      <div class="e-nuxt-button" @click="openURL('https://nuxtjs.org/guide')">
-        Nuxt.js
-      </div>
-      <div class="e-nuxt-button" @click="openURL('https://electronjs.org/docs')">
-        Electron.js
-      </div>
+      <h1>Hello World!</h1>
+      <button v-on:click="openFile()">OpenFile</button>
+      <label>
+        <textarea>
+          {{ code }}
+        </textarea>
+      </label>
     </div>
   </div>
 </template>
 
 <script>
-import { remote } from 'electron'
-import SystemInformation from '@/components/SystemInformation.vue'
+import {remote} from "electron";
+
+/**
+ * 分割代入と呼ばれるjavascript構文です。
+ *
+ * const dialog = remote.dialog
+ * const BrowserWindow = remote.BrowserWindow
+ * とやっていることは一緒です。
+ */
+const {dialog, BrowserWindow} = remote;
 
 export default {
-  components: {
-    SystemInformation
-  },
-  data () {
+  data() {
     return {
-      externalContent: ''
+      code: "",
     }
   },
   methods: {
-    openURL (url) {
-      remote.shell.openExternal(url)
-    }
+
+    /**
+     *
+     * @returns {Promise<void>}
+     *
+     * 非同期のものはfunction名の前にasyncを修飾し、
+     * さらに、非同期となる処理の所の前にはawaitを修飾します。
+     *
+     * 今回の場合ですと、ダイアログを開く処理が非同期なのでdialogの前にawaitを修飾しています。
+     *
+     */
+    async openFile() {
+      // 現在フォーカスされているウィンドウを取得する。
+      // https://www.electronjs.org/docs/api/browser-window
+      const win = BrowserWindow.getFocusedWindow();
+      // ダイアログを開く処理
+      // https://www.electronjs.org/docs/api/dialog
+      const fileNames = await dialog.showOpenDialog(win, {
+        properties: ["openFile"],
+        filters: [
+          {
+            name: "Document",
+            // 選択可能な拡張子を選ぶ
+            extensions: ["java"],
+          },
+        ],
+      });
+
+      console.log(fileNames);
+      // Pathを取り出す
+      console.log(fileNames.filePaths[0]);
+    },
   }
 }
 </script>
-
-<style>
-.e-nuxt-container {
-  min-height: calc(100vh - 50px);
-  background: linear-gradient(to right, #ece9e6, #ffffff);
-  font-family: Helvetica, sans-serif;
-}
-
-.e-nuxt-content {
-  display: flex;
-  justify-content: space-around;
-  padding-top: 100px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-}
-
-.e-nuxt-logo{
-  width: 400px;
-}
-
-.e-nuxt-system-info {
-  padding: 20px;
-  border-top: 1px solid #397c6d;
-  border-bottom: 1px solid #397c6d;
-}
-
-.e-nuxt-links {
-  padding: 100px 0;
-  display: flex;
-  justify-content: center;
-}
-
-.e-nuxt-button {
-  color: #364758;
-  padding: 5px 20px;
-  border: 1px solid #397c6d;
-  margin: 0 20px;
-  border-radius: 15px;
-  font-size: 1rem;
-}
-
-.e-nuxt-button:hover{
-  cursor: pointer;
-  color: white;
-  background-color: #397c6d;
-}
-</style>
