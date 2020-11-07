@@ -14,6 +14,7 @@
 
 <script>
 import {remote} from "electron";
+import dedent from "dedent";
 import {readFile} from "fs";
 
 /**
@@ -54,9 +55,8 @@ export default {
         console.log(data.toString());
 
         // codeに内容を代入
-        this.code = data.toString();
+        this.code = dedent`${data.toString()}`;
       });
-
     },
 
     /**
